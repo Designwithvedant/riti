@@ -25,14 +25,14 @@ const Settings = () => {
       
       <Card>
         <CardHeader>
-          <CardTitle>About AccountaPal</CardTitle>
+          <CardTitle>About Riti</CardTitle>
           <CardDescription>
             Your personal accountability partner
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <p>
-            AccountaPal helps you stay accountable by tracking your tasks and requiring proof of completion.
+            Riti helps you stay accountable by tracking your tasks and requiring proof of completion.
             Complete tasks to earn virtual currency!
           </p>
           <p>

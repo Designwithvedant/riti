@@ -46,8 +46,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
       >
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center space-x-2">
-            <CheckCircle2 className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold">AccountaPal</h1>
+            <img src="/riti-logo.png" alt="Riti Logo" className="h-6 w-6" />
+            <h1 className="text-xl font-bold">Riti</h1>
           </div>
           {isMobile && (
             <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>

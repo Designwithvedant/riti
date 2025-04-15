@@ -38,7 +38,7 @@ const AddTask = () => {
         <CardHeader>
           <CardTitle>Create a Task</CardTitle>
           <CardDescription>
-            Add a new task to track with a specific due date and time.
+            Add a new task to track with Riti.
           </CardDescription>
         </CardHeader>
         <CardContent>
