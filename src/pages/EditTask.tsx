@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { toast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
 const EditTask = () => {
   const { tasks, editTask } = useAccountability();
@@ -53,6 +54,9 @@ const EditTask = () => {
     );
   }
 
+  // Extract time from the due date for the form
+  const dueTime = format(task.dueDate, 'HH:mm');
+
   return (
     <div className="max-w-2xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Edit Task</h1>
@@ -60,7 +64,7 @@ const EditTask = () => {
         <CardHeader>
           <CardTitle>Update Task</CardTitle>
           <CardDescription>
-            Make changes to your task details.
+            Make changes to your task details including due date and time.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -70,6 +74,7 @@ const EditTask = () => {
               description: task.description,
               recurrence: task.recurrence,
               dueDate: new Date(task.dueDate),
+              dueTime: task.dueTime || dueTime,
               reward: task.reward,
               isRecurring: !!task.isRecurring,
               recurringInterval: task.recurringInterval || 1,

@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, RepeatIcon } from 'lucide-react';
+import { CalendarIcon, RepeatIcon, ClockIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Checkbox } from '@/components/ui/checkbox';
 
@@ -25,6 +25,9 @@ const taskFormSchema = z.object({
   recurrence: z.enum(['daily', 'weekly', 'monthly']),
   dueDate: z.date({
     required_error: "Due date is required.",
+  }),
+  dueTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
+    message: "Time must be in format HH:MM (24-hour)",
   }),
   reward: z.number().min(1, {
     message: "Reward must be at least 1 coin.",
@@ -47,6 +50,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     description: '',
     recurrence: 'daily',
     dueDate: new Date(),
+    dueTime: format(new Date(), 'HH:mm'),
     reward: 10,
     isRecurring: false,
     recurringInterval: 1,
@@ -165,6 +169,33 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             )}
           />
         </div>
+
+        {/* Due Time Field */}
+        <FormField
+          control={form.control}
+          name="dueTime"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Due Time</FormLabel>
+              <div className="flex items-center space-x-2">
+                <FormControl>
+                  <div className="relative">
+                    <Input 
+                      type="time" 
+                      {...field} 
+                      className="pl-8"
+                    />
+                    <ClockIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  </div>
+                </FormControl>
+              </div>
+              <FormDescription>
+                Set the time when this task is due (24-hour format)
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}

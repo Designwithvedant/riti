@@ -1,6 +1,7 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
-import { addDays, addWeeks, addMonths, format } from 'date-fns';
+import { addDays, addWeeks, addMonths, format, isBefore, set } from 'date-fns';
 
 export type TaskRecurrence = 'daily' | 'weekly' | 'monthly';
 
@@ -9,7 +10,8 @@ export interface Task {
   title: string;
   description: string;
   recurrence: TaskRecurrence;
-  dueDate: Date;
+  dueDate: Date; // This now includes both date and time
+  dueTime?: string; // Store original time string for display purposes
   completed: boolean;
   proofImage?: string;
   completedAt?: Date;
@@ -36,6 +38,12 @@ const AccountabilityContext = createContext<AccountabilityContextType | undefine
 
 const LOCAL_STORAGE_TASKS_KEY = 'accountability_tasks';
 const LOCAL_STORAGE_CURRENCY_KEY = 'accountability_currency';
+
+// Helper function to combine date and time
+const combineDateAndTime = (date: Date, timeString: string): Date => {
+  const [hours, minutes] = timeString.split(':').map(Number);
+  return set(new Date(date), { hours, minutes, seconds: 0 });
+};
 
 export const AccountabilityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -68,8 +76,14 @@ export const AccountabilityProvider: React.FC<{ children: React.ReactNode }> = (
   }, [currency]);
 
   const addTask = (task: Omit<Task, 'id' | 'completed'>) => {
+    // Create a complete date with both date and time
+    const combinedDueDate = task.dueTime 
+      ? combineDateAndTime(task.dueDate, task.dueTime) 
+      : task.dueDate;
+
     const newTask: Task = {
       ...task,
+      dueDate: combinedDueDate,
       id: `task_${Date.now()}`,
       completed: false,
     };
@@ -110,7 +124,7 @@ export const AccountabilityProvider: React.FC<{ children: React.ReactNode }> = (
         
         toast({
           title: "Recurring Task Created",
-          description: `A new recurring task has been created for ${format(nextDueDate, 'PPP')}.`,
+          description: `A new recurring task has been created for ${format(nextDueDate, 'PPP p')}.`,
         });
       }
       
@@ -152,6 +166,11 @@ export const AccountabilityProvider: React.FC<{ children: React.ReactNode }> = (
   const editTask = (updatedTask: Task) => {
     const taskIndex = tasks.findIndex(task => task.id === updatedTask.id);
     if (taskIndex !== -1) {
+      // If dueTime exists, make sure dueDate includes the time
+      if (updatedTask.dueTime) {
+        updatedTask.dueDate = combineDateAndTime(updatedTask.dueDate, updatedTask.dueTime);
+      }
+      
       const updatedTasks = [...tasks];
       updatedTasks[taskIndex] = updatedTask;
       setTasks(updatedTasks);
@@ -174,7 +193,7 @@ export const AccountabilityProvider: React.FC<{ children: React.ReactNode }> = (
   const getUpcomingTasks = () => {
     const now = new Date();
     return tasks
-      .filter(task => !task.completed && task.dueDate > now)
+      .filter(task => !task.completed && task.dueDate > now) // Now considering the full date+time
       .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime());
   };
 

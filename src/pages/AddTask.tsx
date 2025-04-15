@@ -38,7 +38,7 @@ const AddTask = () => {
         <CardHeader>
           <CardTitle>Create a Task</CardTitle>
           <CardDescription>
-            Add a new task to track. You'll need to provide proof of completion to earn coins.
+            Add a new task to track with a specific due date and time.
           </CardDescription>
         </CardHeader>
         <CardContent>
