@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useNavigate, useParams } from 'react-router-dom';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { toast } from '@/hooks/use-toast';
 
 const EditTask = () => {
   const { tasks, editTask } = useAccountability();
@@ -16,12 +17,25 @@ const EditTask = () => {
 
   const handleSubmit = (data: any) => {
     if (task) {
-      editTask({
-        ...task,
-        ...data,
-        recurringInterval: data.isRecurring ? data.recurringInterval || 1 : undefined,
-      });
-      navigate('/');
+      try {
+        editTask({
+          ...task,
+          ...data,
+          recurringInterval: data.isRecurring ? data.recurringInterval || 1 : undefined,
+        });
+        toast({
+          title: "Task updated",
+          description: "Your task was updated successfully!"
+        });
+        navigate('/');
+      } catch (error) {
+        console.error("Error updating task:", error);
+        toast({
+          title: "Error",
+          description: "There was a problem updating your task",
+          variant: "destructive"
+        });
+      }
     }
   };
 

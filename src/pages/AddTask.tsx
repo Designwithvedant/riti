@@ -4,17 +4,31 @@ import { useAccountability } from '@/contexts/AccountabilityContext';
 import { TaskForm } from '@/components/TaskForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
 const AddTask = () => {
   const { addTask } = useAccountability();
   const navigate = useNavigate();
 
   const handleSubmit = (data: any) => {
-    addTask({
-      ...data,
-      recurringInterval: data.isRecurring ? data.recurringInterval || 1 : undefined,
-    });
-    navigate('/');
+    try {
+      addTask({
+        ...data,
+        recurringInterval: data.isRecurring ? data.recurringInterval || 1 : undefined,
+      });
+      toast({
+        title: "Task created",
+        description: "Your task was created successfully!"
+      });
+      navigate('/');
+    } catch (error) {
+      console.error("Error adding task:", error);
+      toast({
+        title: "Error",
+        description: "There was a problem creating your task",
+        variant: "destructive"
+      });
+    }
   };
 
   return (

@@ -57,6 +57,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskFormSchema),
     defaultValues,
+    // Ensure the form properly recognizes dates
+    mode: "onChange"
   });
 
   const watchIsRecurring = form.watch("isRecurring");
