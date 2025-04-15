@@ -11,8 +11,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, RepeatIcon } from 'lucide-react';
 import { format } from 'date-fns';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const taskFormSchema = z.object({
   title: z.string().min(3, {
@@ -28,6 +29,8 @@ const taskFormSchema = z.object({
   reward: z.number().min(1, {
     message: "Reward must be at least 1 coin.",
   }).max(100),
+  isRecurring: z.boolean().default(false),
+  recurringInterval: z.number().min(1).max(30).optional(),
 });
 
 type TaskFormValues = z.infer<typeof taskFormSchema>;
@@ -45,6 +48,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     recurrence: 'daily',
     dueDate: new Date(),
     reward: 10,
+    isRecurring: false,
+    recurringInterval: 1,
   },
   onSubmit,
   submitLabel,
@@ -53,6 +58,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     resolver: zodResolver(taskFormSchema),
     defaultValues,
   });
+
+  const watchIsRecurring = form.watch("isRecurring");
 
   return (
     <Form {...form}>
@@ -147,6 +154,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                       selected={field.value}
                       onSelect={field.onChange}
                       initialFocus
+                      className="p-3 pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
@@ -178,6 +186,63 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             </FormItem>
           )}
         />
+
+        {/* Recurring task options */}
+        <div className="space-y-4 border p-4 rounded-lg">
+          <FormField
+            control={form.control}
+            name="isRecurring"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                <FormControl>
+                  <Checkbox 
+                    checked={field.value} 
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="flex items-center">
+                    <RepeatIcon className="h-4 w-4 mr-1" />
+                    Make this a recurring task
+                  </FormLabel>
+                  <FormDescription>
+                    This task will automatically recreate itself after completion
+                  </FormDescription>
+                </div>
+              </FormItem>
+            )}
+          />
+
+          {watchIsRecurring && (
+            <FormField
+              control={form.control}
+              name="recurringInterval"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Repeat every</FormLabel>
+                  <div className="flex items-center space-x-2">
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="30"
+                        className="w-16"
+                        {...field}
+                        onChange={e => field.onChange(Number(e.target.value) || 1)}
+                      />
+                    </FormControl>
+                    <span className="text-sm text-muted-foreground">
+                      {form.watch("recurrence") === "daily" && "days"}
+                      {form.watch("recurrence") === "weekly" && "weeks"}
+                      {form.watch("recurrence") === "monthly" && "months"}
+                    </span>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+        </div>
 
         <Button type="submit" className="w-full">
           {submitLabel}

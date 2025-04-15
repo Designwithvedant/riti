@@ -19,6 +19,7 @@ const EditTask = () => {
       editTask({
         ...task,
         ...data,
+        recurringInterval: data.isRecurring ? data.recurringInterval || 1 : undefined,
       });
       navigate('/');
     }
@@ -56,6 +57,8 @@ const EditTask = () => {
               recurrence: task.recurrence,
               dueDate: new Date(task.dueDate),
               reward: task.reward,
+              isRecurring: !!task.isRecurring,
+              recurringInterval: task.recurringInterval || 1,
             }}
             onSubmit={handleSubmit}
             submitLabel="Update Task"

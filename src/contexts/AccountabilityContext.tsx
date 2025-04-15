@@ -1,6 +1,6 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
+import { addDays, addWeeks, addMonths, format } from 'date-fns';
 
 export type TaskRecurrence = 'daily' | 'weekly' | 'monthly';
 
@@ -14,6 +14,8 @@ export interface Task {
   proofImage?: string;
   completedAt?: Date;
   reward: number;
+  isRecurring?: boolean;
+  recurringInterval?: number;
 }
 
 interface AccountabilityContextType {
@@ -40,11 +42,9 @@ export const AccountabilityProvider: React.FC<{ children: React.ReactNode }> = (
   const [currency, setCurrency] = useState<number>(0);
 
   useEffect(() => {
-    // Load tasks from local storage
     const savedTasks = localStorage.getItem(LOCAL_STORAGE_TASKS_KEY);
     if (savedTasks) {
       const parsedTasks = JSON.parse(savedTasks);
-      // Convert date strings back to Date objects
       const tasksWithDates = parsedTasks.map((task: any) => ({
         ...task,
         dueDate: new Date(task.dueDate),
@@ -53,7 +53,6 @@ export const AccountabilityProvider: React.FC<{ children: React.ReactNode }> = (
       setTasks(tasksWithDates);
     }
 
-    // Load currency from local storage
     const savedCurrency = localStorage.getItem(LOCAL_STORAGE_CURRENCY_KEY);
     if (savedCurrency) {
       setCurrency(Number(savedCurrency));
@@ -61,12 +60,10 @@ export const AccountabilityProvider: React.FC<{ children: React.ReactNode }> = (
   }, []);
 
   useEffect(() => {
-    // Save tasks to local storage whenever they change
     localStorage.setItem(LOCAL_STORAGE_TASKS_KEY, JSON.stringify(tasks));
   }, [tasks]);
 
   useEffect(() => {
-    // Save currency to local storage whenever it changes
     localStorage.setItem(LOCAL_STORAGE_CURRENCY_KEY, String(currency));
   }, [currency]);
 
@@ -97,6 +94,26 @@ export const AccountabilityProvider: React.FC<{ children: React.ReactNode }> = (
         completedAt: new Date(),
       };
       
+      if (task.isRecurring && task.recurringInterval && task.recurringInterval > 0) {
+        const nextDueDate = calculateNextDueDate(task.dueDate, task.recurrence, task.recurringInterval);
+        
+        const recurringTask: Task = {
+          ...task,
+          id: `task_${Date.now()}`,
+          dueDate: nextDueDate,
+          completed: false,
+          proofImage: undefined,
+          completedAt: undefined,
+        };
+        
+        updatedTasks.push(recurringTask);
+        
+        toast({
+          title: "Recurring Task Created",
+          description: `A new recurring task has been created for ${format(nextDueDate, 'PPP')}.`,
+        });
+      }
+      
       setTasks(updatedTasks);
       setCurrency(prev => prev + task.reward);
       
@@ -104,6 +121,20 @@ export const AccountabilityProvider: React.FC<{ children: React.ReactNode }> = (
         title: "Task Completed! 🎉",
         description: `You earned ${task.reward} coins for completing ${task.title}.`,
       });
+    }
+  };
+
+  const calculateNextDueDate = (currentDueDate: Date, recurrence: TaskRecurrence, interval: number): Date => {
+    const date = new Date(currentDueDate);
+    switch (recurrence) {
+      case 'daily':
+        return addDays(date, interval);
+      case 'weekly':
+        return addWeeks(date, interval);
+      case 'monthly':
+        return addMonths(date, interval);
+      default:
+        return date;
     }
   };
 

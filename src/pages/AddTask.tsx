@@ -10,7 +10,10 @@ const AddTask = () => {
   const navigate = useNavigate();
 
   const handleSubmit = (data: any) => {
-    addTask(data);
+    addTask({
+      ...data,
+      recurringInterval: data.isRecurring ? data.recurringInterval || 1 : undefined,
+    });
     navigate('/');
   };
 
