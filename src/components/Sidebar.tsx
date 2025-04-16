@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAccountability } from '@/contexts/AccountabilityContext';
 import { Button } from '@/components/ui/button';
@@ -46,7 +45,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
       >
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center space-x-2">
-            <img src="/riti-logo.png" alt="Riti Logo" className="h-6 w-6" />
+            <img src="/lovable-uploads/1165a46b-2f3d-41c8-a622-6dd6659063b2.png" alt="Riti Logo" className="h-6 w-6" />
             <h1 className="text-xl font-bold">Riti</h1>
           </div>
           {isMobile && (
