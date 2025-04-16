@@ -25,9 +25,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const { currency } = useAccountability();
   const isMobile = useIsMobile();
 
+  React.useEffect(() => {
+    console.log('Logo image source:', '/lovable-uploads/1165a46b-2f3d-41c8-a622-6dd6659063b2.png');
+  }, []);
+
   return (
     <>
-      {/* Sidebar backdrop for mobile */}
       {isMobile && isOpen && (
         <div 
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -35,7 +38,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         />
       )}
 
-      {/* Sidebar */}
       <div
         className={cn(
           "fixed top-0 bottom-0 lg:left-0 z-50 lg:relative lg:z-auto",
@@ -45,7 +47,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
       >
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center space-x-2">
-            <img src="/lovable-uploads/1165a46b-2f3d-41c8-a622-6dd6659063b2.png" alt="Riti Logo" className="h-6 w-6" />
+            <img 
+              src="/lovable-uploads/1165a46b-2f3d-41c8-a622-6dd6659063b2.png" 
+              alt="Riti Logo" 
+              className="h-6 w-6" 
+              onError={(e) => {
+                console.error('Logo image failed to load:', e);
+              }}
+            />
             <h1 className="text-xl font-bold">Riti</h1>
           </div>
           {isMobile && (
@@ -85,7 +94,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         </div>
       </div>
 
-      {/* Toggle button for sidebar */}
       {!isOpen && (
         <Button 
           variant="outline" 
